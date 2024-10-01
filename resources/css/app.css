@@ -1,0 +1,25 @@
+body {
+	background: #e5e5e5;
+}
+
+.card-rounded {
+    border-radius: 20px!important;
+}
+
+ul.list-none {
+    list-style: none;
+}
+
+span.list-style-simple {
+    margin-left: 24px;
+    font-style: italic;
+}
+
+span.list-style-item {
+    color: rgb(6, 100, 195);
+    font-weight: 600;
+}
+
+.crossed {
+    text-decoration: line-through;
+}
