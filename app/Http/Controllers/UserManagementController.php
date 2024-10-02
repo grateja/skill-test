@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 
 class UserManagementController extends Controller
 {
+    public function index() {
+        $users = User::whereHas('roles', function($query) {
+            $query->where('name', 'user');
+        })->get();
+
+        return response()->json($users);
+    }
+
     public function updateProfile(Request $request) {
         $user = auth('sanctum')->user();
         $rules = [

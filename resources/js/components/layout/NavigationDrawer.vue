@@ -33,7 +33,7 @@
         title: 'Home',
       drawer: false,
       items: [
-        // { title: 'User management', to: '/user-management' },
+        { title: 'Tasks', to: '/tasks' },
         // Add more items as needed
       ],
     }),

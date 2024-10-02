@@ -28,7 +28,12 @@
         methods: {
             login() {
                 this.$store.dispatch('auth/login', this.formData).then((res) => {
-                    this.$router.push({name:'home'})
+                    console.log(res.data.user.roles)
+                    if(res.data.user.roles.map(item => item.name).includes('manager')) {
+                        this.$router.push({name:'tasks'})
+                    } else {
+                        this.$router.push({name:'myTasks'})
+                    }
                 });
                 // this.$store.dispatch('post', {
                 //     tag: 'login',

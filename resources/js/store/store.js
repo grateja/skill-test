@@ -9,7 +9,8 @@ const store = createStore({
         return {
             errorKeys: Mapper,
             loadingKeys: new LoadingKeys(),
-            currentUser: null
+            currentUser: null,
+            users: []
         }
     },
     mutations: {
@@ -18,6 +19,9 @@ const store = createStore({
             // if(!state.loadingKeys.includes(tag)) {
             //     state.loadingKeys.push(tag)
             // }
+        },
+        setUsers(state, users) {
+            state.users = users;
         },
         clearLoading(state, tag) {
             state.loadingKeys.remove(tag);
@@ -41,7 +45,6 @@ const store = createStore({
                 return res;
             }).catch(err => {
                 context.commit('setErrors', err.response.data.errors);
-                console.log("fuck")
                 return Promise.reject(err);
             }).finally(() => {
                 context.commit('clearLoading', data.tag)
@@ -60,6 +63,17 @@ const store = createStore({
             }).finally(() => {
                 context.commit('clearLoading', data.tag)
             });
+        },
+        loadUsers(context, data) {
+            context.commit('setLoading', 'get-users')
+            return axios.get('/api/user-management').then((res, rej) => {
+                this.commit('setUsers', res.data);
+                return res;
+            }).catch(err => {
+                return Promise.reject(err);
+            }).finally(() => {
+                context.commit('clearLoading', 'get-users')
+            });
         }
     },
     getters: {
@@ -71,6 +85,9 @@ const store = createStore({
         },
         getCurrentUser(state) {
             return state.currentUser;
+        },
+        getUsers(state) {
+            return state.users
         }
     },
     modules: {

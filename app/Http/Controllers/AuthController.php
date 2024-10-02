@@ -18,7 +18,7 @@ class AuthController extends Controller
 
         $errors = [];
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('roles')->where('email', $request->email)->first();
         if($user == null) {
             $errors = [
                 'email' => ['Email does not exists!']

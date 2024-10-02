@@ -27,6 +27,23 @@ const router = createRouter({
                     path: 'change-password',
                     name: 'changePassword',
                     component: () => import('./components/user-management/ChangePassword.vue'),
+                },
+                {
+                    path: 'tasks',
+                    name: 'tasks',
+                    component: () => import('./components/tasks-management/Index.vue'),
+                },
+                {
+                    path: 'my-tasks',
+                    name: 'myTasks',
+                    component: () => import('./components/my-tasks/Index.vue'),
+                    children: [
+                        {
+                            path: ':taskId',
+                            name: 'viewTask',
+                            component: () => import('./components/my-tasks/ViewTask.vue'),
+                        }
+                    ]
                 }
             ]
     	},
