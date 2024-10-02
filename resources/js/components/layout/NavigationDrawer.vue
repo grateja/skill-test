@@ -4,7 +4,7 @@
             v-model="drawer"
             app
         >
-            <v-list-item v-if="currentUser" :title="currentUser.name" :subtitle="currentUser.email"></v-list-item>
+            <v-list-item :to="{name: 'userManagement'}" v-if="currentUser" :title="currentUser.name" :subtitle="currentUser.email"></v-list-item>
             <v-divider></v-divider>
             <v-list-item v-for="item in items" link :title="item.title" :to="item.to">
 
@@ -33,7 +33,7 @@
         title: 'Home',
       drawer: false,
       items: [
-        { title: 'Product lines', to: '/product-lines' },
+        // { title: 'User management', to: '/user-management' },
         // Add more items as needed
       ],
     }),

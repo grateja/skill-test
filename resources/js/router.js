@@ -12,6 +12,23 @@ const router = createRouter({
     		path: "/",
             name: 'home',
     		component: MainBody,
+            children: [
+                {
+                    path: 'user-management',
+                    name: 'userManagement',
+                    component: () => import('./components/user-management/Index.vue'),
+                },
+                {
+                    path: 'edit-self',
+                    name: 'editSelf',
+                    component: () => import('./components/user-management/Edit.vue'),
+                },
+                {
+                    path: 'change-password',
+                    name: 'changePassword',
+                    component: () => import('./components/user-management/ChangePassword.vue'),
+                }
+            ]
     	},
     	{
     		path: "/login",

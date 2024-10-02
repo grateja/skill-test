@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\UserManagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,3 +32,11 @@ Route::prefix('auth')->middleware('auth:sanctum')->controller(AuthController::cl
     Route::get('check', 'check');
 });
 
+// /api/user-management
+Route::prefix('user-management')->middleware(['auth:sanctum'])->controller(UserManagementController::class)->group(function() {
+    // /api/user-management/update-self
+    Route::post('update-self', 'updateProfile');
+
+    // /api/user-management/change-password
+    Route::post('change-password', 'changePassword');
+});

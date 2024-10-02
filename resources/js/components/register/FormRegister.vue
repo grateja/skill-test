@@ -18,7 +18,7 @@
                     @keydown="clear('password')"  />
 
                 <v-expand-transition>
-                    <v-text-field class="my-3" v-if="!showPassword" v-model="formData.confirmPassword" label="Confirm Password" variant="outlined" />
+                    <v-text-field class="my-3" v-if="!showPassword" v-model="formData.password_confirmation" type="password" label="Confirm Password" variant="outlined" />
                 </v-expand-transition>
 
                 <v-btn type="submit" color="primary" :loading="loading">Register</v-btn>
@@ -34,17 +34,24 @@ export default {
             formData: {
                 name: null,
                 email: null,
-                password: null
+                password: null,
+                password_confirmation: null
             },
             showPassword: false
         }
     },
     methods: {
         submit() {
+            if(this.showPassword) {
+                this.formData.password_confirmation = this.formData.password
+            }
+
             this.$store.dispatch('post', {
                 tag: 'register',
                 url: 'api/register',
                 formData: this.formData
+            }).then((res) => {
+                this.$store.commit('serUser', res.data.user, {root: true});
             })
         },
         clear(key) {
