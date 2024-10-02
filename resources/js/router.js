@@ -14,6 +14,11 @@ const router = createRouter({
     		component: MainBody,
             children: [
                 {
+                    path: 'dashboard',
+                    name: 'dashboard',
+                    component: () => import('./components/dashboard/Index.vue'),
+                },
+                {
                     path: 'user-management',
                     name: 'userManagement',
                     component: () => import('./components/user-management/Index.vue'),
@@ -32,6 +37,11 @@ const router = createRouter({
                     path: 'tasks',
                     name: 'tasks',
                     component: () => import('./components/tasks-management/Index.vue'),
+                },
+                {
+                    path: 'tasks/:taskId',
+                    name: 'reviewTask',
+                    component: () => import('./components/tasks-management/ReviewTask.vue'),
                 },
                 {
                     path: 'my-tasks',

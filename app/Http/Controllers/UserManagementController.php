@@ -67,4 +67,8 @@ class UserManagementController extends Controller
             ]);
         }
     }
+
+    public function show($userId) {
+        return User::findOrFail($userId);
+    }
 }

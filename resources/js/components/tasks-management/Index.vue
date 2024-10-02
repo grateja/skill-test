@@ -1,5 +1,8 @@
 <template>
     <v-container>
+        <v-btn @click="viewArchives" class="my-4" v-if="archiveFlag == 0">Archives</v-btn>
+        <v-btn @click="viewArchives" class="my-4" v-if="archiveFlag == 1">Back</v-btn>
+
         <v-text-field
             append-icon="mdi-magnify"
             label="Search"
@@ -12,10 +15,14 @@
         <v-btn @click="openAddEdit(null)" color="primary" class="my-4">Create new</v-btn>
 
         <v-tabs
-            v-model="tab" bg-color="primary">
-            <v-tab value="0">On going</v-tab>
-            <v-tab value="1">Archived</v-tab>
+            v-model="status">
+            <v-tab value="">All</v-tab>
+            <v-tab value="todo">To do</v-tab>
+            <v-tab value="on-going">On-going</v-tab>
+            <v-tab value="done">Done</v-tab>
         </v-tabs>
+
+        <v-divider class="my-8"></v-divider>
 
         <v-data-table
             :headers="header"
@@ -23,7 +30,9 @@
             :items="items"
             :loading="loading"
         >
-
+            <template v-slot:item.due_date="{ item }">
+                {{ $moment(item.due_date).format('YYYY-MM-DD') }}
+            </template>
             <template v-slot:item.status="{item}">
                 <v-chip variant="outlined" :color="getStatusColor(item.status)">{{item.status}}</v-chip>
             </template>
@@ -34,18 +43,25 @@
                 <v-icon
                     class="me-2"
                     size="small"
+                    @click="reviewTask(item)"
+                >
+                    mdi-open-in-new
+                </v-icon>
+                <v-icon
+                    class="me-2"
+                    size="small"
                     @click="openAddEdit(item)"
                 >
                     mdi-pencil
                 </v-icon>
-                <v-icon
+                <!-- <v-icon
                     class="me-2"
                     size="small"
                     v-if="item.status == 'done' && !item.archive"
                     @click="archive(item)"
                 >
                     mdi-archive-check
-                </v-icon>
+                </v-icon> -->
                 <v-icon
                     class="me-2"
                     size="small"
@@ -70,7 +86,8 @@ export default {
     },
     data: () => {
         return {
-            tab: 'on-going',
+            archiveFlag: 0,
+            status: null,
             currentTask: null,
             openAddEditDialog: false,
             page: 1,
@@ -119,6 +136,7 @@ export default {
     },
     methods: {
         onInput() {
+            this.page = 1;
             this.debouncedLoadData()
         },
         loadData() {
@@ -128,7 +146,8 @@ export default {
                 params: {
                     keyword: this.keyword,
                     page: this.page,
-                    archive: this.tab
+                    archive: this.archiveFlag,
+                    status: this.status
                 }
             }).then((res, rej) => {
                 if(this.reset) {
@@ -145,24 +164,37 @@ export default {
             this.reset = false
             this.loadData()
         },
+        viewArchives() {
+            this.archiveFlag = this.archiveFlag == 1 ? 0 : 1
+            this.status = ''
+            this.loadData()
+        },
+        reviewTask(task) {
+            this.$router.push({
+                name: 'reviewTask',
+                params: {
+                    taskId: task.id
+                }
+            })
+        },
         openAddEdit(task) {
             this.currentTask = task;
             this.openAddEditDialog = true;
         },
-        archive(task) {
-            if(confirm("Archive this task")) {
-                axios.post(`/api/tasks/${task.id}/archive`).then((res, rej) => {
-                    this.items = this.items.filter(item => item.id !== task.id);
-                });
-            }
-        },
-        restore(task) {
-            if(confirm("Restore this task")) {
-                axios.post(`/api/tasks/${task.id}/restore`).then((res, rej) => {
-                    this.items = this.items.filter(item => item.id !== task.id);
-                });
-            }
-        },
+        // archive(task) {
+        //     if(confirm("Archive this task")) {
+        //         axios.post(`/api/tasks/${task.id}/archive`).then((res, rej) => {
+        //             this.items = this.items.filter(item => item.id !== task.id);
+        //         });
+        //     }
+        // },
+        // restore(task) {
+        //     if(confirm("Restore this task")) {
+        //         axios.post(`/api/tasks/${task.id}/restore`).then((res, rej) => {
+        //             this.items = this.items.filter(item => item.id !== task.id);
+        //         });
+        //     }
+        // },
         updateItems(data) {
             if(data.action == 'create') {
                 this.items.push(data.task);
@@ -205,6 +237,9 @@ export default {
             if(newVal) {
                 this.loadData();
             }
+        },
+        status(newVal) {
+            this.loadData();
         }
     }
 }

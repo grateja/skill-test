@@ -16,6 +16,10 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, UsesUuid;
 
+    public $appends = [
+        'roles'
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -51,13 +55,16 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
+    public function getRolesAttribute() {
+        return $this->roles()->pluck('name')->toArray();
+    }
+
     public function hasRole($role) {
         return $this->roles()->whereIn('name', $role)->exists();
     }
 
-
-    public function quotations() {
-        return $this->hasMany(Quotation::class);
+    public function tasks() {
+        return $this->hasMany(Task::class);
     }
 
     public function createToken(string $name, array $abilities = ['*'], $expiresAt = null, string $userId = null) {

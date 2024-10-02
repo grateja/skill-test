@@ -6,7 +6,7 @@
         >
             <v-list-item :to="{name: 'userManagement'}" v-if="currentUser" :title="currentUser.name" :subtitle="currentUser.email"></v-list-item>
             <v-divider></v-divider>
-            <v-list-item v-for="item in items" link :title="item.title" :to="item.to">
+            <v-list-item v-for="item in filteredMenu" link :title="item.title" :to="item.to">
 
             </v-list-item>
         </v-navigation-drawer>
@@ -27,15 +27,29 @@
     </v-app>
 </template>
 
-  <script>
+<script>
   export default {
     data: () => ({
         title: 'Home',
-      drawer: false,
-      items: [
-        { title: 'Tasks', to: '/tasks' },
-        // Add more items as needed
-      ],
+        drawer: false,
+        items: [
+            {
+                title: 'Dashboard',
+                to: '/dashboard',
+                roles: ['admin', 'manager']
+            },
+            {
+                title: 'Tasks',
+                to: '/tasks',
+                roles: ['admin', 'manager']
+            },
+            {
+                title: 'My Tasks',
+                to: '/my-tasks',
+                roles: ['user']
+            },
+            // Add more items as needed
+        ],
     }),
     methods: {
         logout() {
@@ -52,6 +66,26 @@
         },
         loadingKeys() {
             return this.$store.getters.loadingKeys;
+        },
+        filteredMenu() {
+            let user = this.currentUser;
+            if(user && this.items.length) {
+                let items = this.items.filter(link =>
+                    // get only the items with specific roles
+                    link.roles.some(role => (role == user.roles[0] || role == '*')) &&
+
+                    // remove unnecessary roles
+                    !link.roles.some(role => role == `!${user.roles[0]}`)).map(link => {
+
+                        // only for items with sub tab
+                        if(link.children){
+                            link.childrenFiltered = link.children.filter(l => l.roles.some(role => role == user.roles[0] || role == '*'));
+                        }
+                        return link;
+                    });
+                return items;
+            }
+            return [];
         }
     }
   };

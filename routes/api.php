@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountsController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserManagementController;
@@ -37,6 +38,8 @@ Route::prefix('auth')->middleware('auth:sanctum')->controller(AuthController::cl
 Route::prefix('user-management')->middleware(['auth:sanctum'])->controller(UserManagementController::class)->group(function() {
     Route::get('/', 'index');
 
+    Route::get('{userId}', 'show');
+
     // /api/user-management/update-self
     Route::post('update-self', 'updateProfile');
 
@@ -47,14 +50,18 @@ Route::prefix('user-management')->middleware(['auth:sanctum'])->controller(UserM
 Route::prefix('tasks')->controller(TaskController::class)->middleware('auth:sanctum')->group(function() {
     Route::get('/', 'index');
 
+    Route::get('{taskId}', 'show');
+
     Route::post('{taskId}/submit', 'submit');
+
+    Route::post('{taskId}/start-task', 'startTask');
 
     Route::middleware('role:manager,admin')->group(function() {
         // /api/tasks/create
         Route::post('create', 'store');
 
         // /api/tasks/{taskId}/update
-        Route::post('{taskId}/update', 'store');
+        Route::post('{taskId}/update', 'update');
 
         // /api/tasks/{taskId}/archive
         Route::post('{taskId}/archive', 'archive');
@@ -62,6 +69,10 @@ Route::prefix('tasks')->controller(TaskController::class)->middleware('auth:sanc
         // /api/tasks/{taskId}/restore
         Route::post('{taskId}/restore', 'restore');
     });
+});
+
+Route::prefix('dashboard')->controller(DashboardController::class)->middleware(['auth:sanctum', 'role:manager,admin'])->group(function() {
+    Route::get('/', 'index');
 });
 
 // // /api/tasks

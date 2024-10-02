@@ -16,12 +16,12 @@
                     </v-row>
                     <v-select :items="['low', 'medium', 'high']" variant="outlined" v-model="formData.priority_level" label="Priority" :error-messages="errors.get('priority_level')"></v-select>
                     <p class="text-red" v-if="errors.has('user_id')">{{errors.get('user_id')}}</p>
-                    <v-btn @click="openSelectUserDialog = true">Assign to {{ userName }}</v-btn>
+                    <v-btn @click="openSelectUserDialog = true" :loading="loadingKeys.hasAny('get-user')">Assign to {{ userName }}</v-btn>
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions>
                     <v-btn text="Close" @click="$emit('close')"/>
-                    <v-btn type="submit" color="primary" :loading="loadingKeys.hasAny('save-task')">Save</v-btn>
+                    <v-btn type="submit" color="primary" :loading="loadingKeys.hasAny('save-task')" :disabled="loadingKeys.hasAny('get-user')">Save</v-btn>
                 </v-card-actions>
             </v-card>
         </form>
@@ -47,8 +47,8 @@ export default {
                 description: null,
             },
             user: null,
-            due_date: null,
-            due_time: null,
+            due_date: this.$moment().format('YYYY-MM-DD'),
+            due_time:  this.$moment().format('HH:mm'),
         }
     },
     methods: {
@@ -70,6 +70,14 @@ export default {
                 });
             });
         },
+        loadUser(userId) {
+            this.$store.dispatch('get', {
+                url: `/api/user-management/${userId}`,
+                tag: 'get-user',
+            }).then((res) => {
+                this.user = res.data;
+            })
+        }
     },
     created() {
         if(this.users.length == 0) {
@@ -97,15 +105,20 @@ export default {
                     this.formData.title = newVal.title;
                     this.formData.description = newVal.description;
                     this.formData.priority_level = newVal.priority_level;
-                    this.formData.due_date = newVal.due_date
-                    this.formData.priority_level = newVal.priority_level
+                    this.due_date = this.$moment(newVal.due_date).format('YYYY-MM-DD')
+                    this.due_time = this.$moment(newVal.due_date).format('HH:mm')
                     this.action = 'update'
+                    if(newVal.user_id != null && newVal.user == null) {
+                        this.loadUser(newVal.user_id)
+                    } else {
+                        this.user_id = null
+                    }
                 } else {
                     this.formData.title = null;
                     this.formData.description = null;
-                    this.formData.priority_level = null;
-                    this.formData.due_date = null
-                    this.formData.priority_level = null
+                    this.formData.priority_level = 'low';
+                    this.due_date = this.$moment().format('YYYY-MM-DD')
+                    this.due_time = this.$moment().format('HH:mm')
                     this.action = 'create'
                 }
             },

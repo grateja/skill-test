@@ -22,6 +22,7 @@
                 </v-expand-transition>
 
                 <v-btn type="submit" color="primary" :loading="loading">Register</v-btn>
+                <v-btn type="submit" to="/login">Login</v-btn>
             </v-card-text>
         </v-card>
     </form>
